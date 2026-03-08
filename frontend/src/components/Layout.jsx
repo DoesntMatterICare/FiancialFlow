@@ -8,7 +8,8 @@ import {
   FileText, 
   Upload,
   TrendingUp,
-  Settings
+  Settings,
+  Globe
 } from "lucide-react";
 import { useCurrency } from "@/context/CurrencyContext";
 
@@ -16,6 +17,7 @@ const navItems = [
   { path: "/", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/transactions", icon: ArrowLeftRight, label: "Transactions" },
   { path: "/analytics", icon: BarChart3, label: "Analytics" },
+  { path: "/converter", icon: Globe, label: "Currency" },
   { path: "/budget", icon: Wallet, label: "Budget" },
   { path: "/tax", icon: Calculator, label: "Tax Estimator" },
   { path: "/reports", icon: FileText, label: "Reports" },
