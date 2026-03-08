@@ -1018,6 +1018,10 @@ async def create_transaction(input: TransactionCreate):
     tx_dict['is_anomaly'] = False
     tx_dict['created_at'] = datetime.now(timezone.utc).isoformat()
     
+    # Store the currency the transaction was entered in
+    settings = await db.settings.find_one({"id": "default"}, {"_id": 0})
+    tx_dict['original_currency'] = settings.get("currency", "USD") if settings else "USD"
+    
     # Auto-categorize if not provided or is "Other"
     if tx_dict['category'] == "Other":
         tx_dict['category'] = categorize_transaction(tx_dict['description'])
