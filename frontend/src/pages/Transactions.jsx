@@ -43,6 +43,7 @@ import {
   getCategories 
 } from "@/lib/api";
 import { toast } from "sonner";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const TRANSACTION_TYPES = [
   { value: "income", label: "Income" },
@@ -50,6 +51,7 @@ const TRANSACTION_TYPES = [
 ];
 
 export const Transactions = () => {
+  const { formatCurrency, getCurrencySymbol } = useCurrency();
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -148,13 +150,6 @@ export const Transactions = () => {
       tags: []
     });
     setEditingTransaction(null);
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(value);
   };
 
   const filteredTransactions = transactions.filter(tx => {
