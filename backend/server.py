@@ -261,6 +261,324 @@ CATEGORY_RULES = {
     "irs": Category.TAXES,
 }
 
+# ============== ALL SUPPORTED CURRENCIES (160+) ==============
+ALL_CURRENCIES = {
+    "USD": {"name": "US Dollar", "symbol": "$", "locale": "en-US", "decimals": 2},
+    "EUR": {"name": "Euro", "symbol": "€", "locale": "de-DE", "decimals": 2},
+    "GBP": {"name": "British Pound", "symbol": "£", "locale": "en-GB", "decimals": 2},
+    "INR": {"name": "Indian Rupee", "symbol": "₹", "locale": "en-IN", "decimals": 2},
+    "JPY": {"name": "Japanese Yen", "symbol": "¥", "locale": "ja-JP", "decimals": 0},
+    "CNY": {"name": "Chinese Yuan", "symbol": "¥", "locale": "zh-CN", "decimals": 2},
+    "AUD": {"name": "Australian Dollar", "symbol": "A$", "locale": "en-AU", "decimals": 2},
+    "CAD": {"name": "Canadian Dollar", "symbol": "C$", "locale": "en-CA", "decimals": 2},
+    "CHF": {"name": "Swiss Franc", "symbol": "CHF", "locale": "de-CH", "decimals": 2},
+    "HKD": {"name": "Hong Kong Dollar", "symbol": "HK$", "locale": "zh-HK", "decimals": 2},
+    "SGD": {"name": "Singapore Dollar", "symbol": "S$", "locale": "en-SG", "decimals": 2},
+    "SEK": {"name": "Swedish Krona", "symbol": "kr", "locale": "sv-SE", "decimals": 2},
+    "KRW": {"name": "South Korean Won", "symbol": "₩", "locale": "ko-KR", "decimals": 0},
+    "NOK": {"name": "Norwegian Krone", "symbol": "kr", "locale": "nb-NO", "decimals": 2},
+    "NZD": {"name": "New Zealand Dollar", "symbol": "NZ$", "locale": "en-NZ", "decimals": 2},
+    "MXN": {"name": "Mexican Peso", "symbol": "$", "locale": "es-MX", "decimals": 2},
+    "TWD": {"name": "Taiwan Dollar", "symbol": "NT$", "locale": "zh-TW", "decimals": 2},
+    "ZAR": {"name": "South African Rand", "symbol": "R", "locale": "en-ZA", "decimals": 2},
+    "BRL": {"name": "Brazilian Real", "symbol": "R$", "locale": "pt-BR", "decimals": 2},
+    "DKK": {"name": "Danish Krone", "symbol": "kr", "locale": "da-DK", "decimals": 2},
+    "PLN": {"name": "Polish Zloty", "symbol": "zł", "locale": "pl-PL", "decimals": 2},
+    "THB": {"name": "Thai Baht", "symbol": "฿", "locale": "th-TH", "decimals": 2},
+    "IDR": {"name": "Indonesian Rupiah", "symbol": "Rp", "locale": "id-ID", "decimals": 0},
+    "HUF": {"name": "Hungarian Forint", "symbol": "Ft", "locale": "hu-HU", "decimals": 0},
+    "CZK": {"name": "Czech Koruna", "symbol": "Kč", "locale": "cs-CZ", "decimals": 2},
+    "ILS": {"name": "Israeli Shekel", "symbol": "₪", "locale": "he-IL", "decimals": 2},
+    "CLP": {"name": "Chilean Peso", "symbol": "$", "locale": "es-CL", "decimals": 0},
+    "PHP": {"name": "Philippine Peso", "symbol": "₱", "locale": "en-PH", "decimals": 2},
+    "AED": {"name": "UAE Dirham", "symbol": "د.إ", "locale": "ar-AE", "decimals": 2},
+    "COP": {"name": "Colombian Peso", "symbol": "$", "locale": "es-CO", "decimals": 0},
+    "SAR": {"name": "Saudi Riyal", "symbol": "﷼", "locale": "ar-SA", "decimals": 2},
+    "MYR": {"name": "Malaysian Ringgit", "symbol": "RM", "locale": "ms-MY", "decimals": 2},
+    "RON": {"name": "Romanian Leu", "symbol": "lei", "locale": "ro-RO", "decimals": 2},
+    "TRY": {"name": "Turkish Lira", "symbol": "₺", "locale": "tr-TR", "decimals": 2},
+    "RUB": {"name": "Russian Ruble", "symbol": "₽", "locale": "ru-RU", "decimals": 2},
+    "NGN": {"name": "Nigerian Naira", "symbol": "₦", "locale": "en-NG", "decimals": 2},
+    "ARS": {"name": "Argentine Peso", "symbol": "$", "locale": "es-AR", "decimals": 2},
+    "EGP": {"name": "Egyptian Pound", "symbol": "E£", "locale": "ar-EG", "decimals": 2},
+    "PKR": {"name": "Pakistani Rupee", "symbol": "₨", "locale": "ur-PK", "decimals": 2},
+    "VND": {"name": "Vietnamese Dong", "symbol": "₫", "locale": "vi-VN", "decimals": 0},
+    "BDT": {"name": "Bangladeshi Taka", "symbol": "৳", "locale": "bn-BD", "decimals": 2},
+    "QAR": {"name": "Qatari Riyal", "symbol": "﷼", "locale": "ar-QA", "decimals": 2},
+    "KWD": {"name": "Kuwaiti Dinar", "symbol": "د.ك", "locale": "ar-KW", "decimals": 3},
+    "BHD": {"name": "Bahraini Dinar", "symbol": ".د.ب", "locale": "ar-BH", "decimals": 3},
+    "OMR": {"name": "Omani Rial", "symbol": "﷼", "locale": "ar-OM", "decimals": 3},
+    "JOD": {"name": "Jordanian Dinar", "symbol": "د.ا", "locale": "ar-JO", "decimals": 3},
+    "LKR": {"name": "Sri Lankan Rupee", "symbol": "₨", "locale": "si-LK", "decimals": 2},
+    "NPR": {"name": "Nepalese Rupee", "symbol": "₨", "locale": "ne-NP", "decimals": 2},
+    "MMK": {"name": "Myanmar Kyat", "symbol": "K", "locale": "my-MM", "decimals": 0},
+    "KES": {"name": "Kenyan Shilling", "symbol": "KSh", "locale": "sw-KE", "decimals": 2},
+    "UGX": {"name": "Ugandan Shilling", "symbol": "USh", "locale": "en-UG", "decimals": 0},
+    "TZS": {"name": "Tanzanian Shilling", "symbol": "TSh", "locale": "sw-TZ", "decimals": 0},
+    "GHS": {"name": "Ghanaian Cedi", "symbol": "₵", "locale": "en-GH", "decimals": 2},
+    "XOF": {"name": "West African CFA", "symbol": "CFA", "locale": "fr-SN", "decimals": 0},
+    "XAF": {"name": "Central African CFA", "symbol": "FCFA", "locale": "fr-CM", "decimals": 0},
+    "MAD": {"name": "Moroccan Dirham", "symbol": "د.م.", "locale": "ar-MA", "decimals": 2},
+    "DZD": {"name": "Algerian Dinar", "symbol": "د.ج", "locale": "ar-DZ", "decimals": 2},
+    "TND": {"name": "Tunisian Dinar", "symbol": "د.ت", "locale": "ar-TN", "decimals": 3},
+    "LBP": {"name": "Lebanese Pound", "symbol": "ل.ل", "locale": "ar-LB", "decimals": 0},
+    "IQD": {"name": "Iraqi Dinar", "symbol": "ع.د", "locale": "ar-IQ", "decimals": 0},
+    "IRR": {"name": "Iranian Rial", "symbol": "﷼", "locale": "fa-IR", "decimals": 0},
+    "AFN": {"name": "Afghan Afghani", "symbol": "؋", "locale": "ps-AF", "decimals": 2},
+    "KZT": {"name": "Kazakhstani Tenge", "symbol": "₸", "locale": "kk-KZ", "decimals": 2},
+    "UZS": {"name": "Uzbekistani Som", "symbol": "so'm", "locale": "uz-UZ", "decimals": 0},
+    "AZN": {"name": "Azerbaijani Manat", "symbol": "₼", "locale": "az-AZ", "decimals": 2},
+    "GEL": {"name": "Georgian Lari", "symbol": "₾", "locale": "ka-GE", "decimals": 2},
+    "AMD": {"name": "Armenian Dram", "symbol": "֏", "locale": "hy-AM", "decimals": 0},
+    "UAH": {"name": "Ukrainian Hryvnia", "symbol": "₴", "locale": "uk-UA", "decimals": 2},
+    "BYN": {"name": "Belarusian Ruble", "symbol": "Br", "locale": "be-BY", "decimals": 2},
+    "MDL": {"name": "Moldovan Leu", "symbol": "L", "locale": "ro-MD", "decimals": 2},
+    "ALL": {"name": "Albanian Lek", "symbol": "L", "locale": "sq-AL", "decimals": 2},
+    "MKD": {"name": "Macedonian Denar", "symbol": "ден", "locale": "mk-MK", "decimals": 2},
+    "BAM": {"name": "Bosnia Mark", "symbol": "KM", "locale": "bs-BA", "decimals": 2},
+    "RSD": {"name": "Serbian Dinar", "symbol": "дин.", "locale": "sr-RS", "decimals": 2},
+    "HRK": {"name": "Croatian Kuna", "symbol": "kn", "locale": "hr-HR", "decimals": 2},
+    "BGN": {"name": "Bulgarian Lev", "symbol": "лв", "locale": "bg-BG", "decimals": 2},
+    "ISK": {"name": "Icelandic Krona", "symbol": "kr", "locale": "is-IS", "decimals": 0},
+    "PEN": {"name": "Peruvian Sol", "symbol": "S/", "locale": "es-PE", "decimals": 2},
+    "UYU": {"name": "Uruguayan Peso", "symbol": "$U", "locale": "es-UY", "decimals": 2},
+    "BOB": {"name": "Bolivian Boliviano", "symbol": "Bs.", "locale": "es-BO", "decimals": 2},
+    "PYG": {"name": "Paraguayan Guarani", "symbol": "₲", "locale": "es-PY", "decimals": 0},
+    "VES": {"name": "Venezuelan Bolivar", "symbol": "Bs.S", "locale": "es-VE", "decimals": 2},
+    "DOP": {"name": "Dominican Peso", "symbol": "RD$", "locale": "es-DO", "decimals": 2},
+    "CRC": {"name": "Costa Rican Colon", "symbol": "₡", "locale": "es-CR", "decimals": 2},
+    "GTQ": {"name": "Guatemalan Quetzal", "symbol": "Q", "locale": "es-GT", "decimals": 2},
+    "HNL": {"name": "Honduran Lempira", "symbol": "L", "locale": "es-HN", "decimals": 2},
+    "NIO": {"name": "Nicaraguan Cordoba", "symbol": "C$", "locale": "es-NI", "decimals": 2},
+    "PAB": {"name": "Panamanian Balboa", "symbol": "B/.", "locale": "es-PA", "decimals": 2},
+    "JMD": {"name": "Jamaican Dollar", "symbol": "J$", "locale": "en-JM", "decimals": 2},
+    "TTD": {"name": "Trinidad Dollar", "symbol": "TT$", "locale": "en-TT", "decimals": 2},
+    "BBD": {"name": "Barbadian Dollar", "symbol": "Bds$", "locale": "en-BB", "decimals": 2},
+    "BSD": {"name": "Bahamian Dollar", "symbol": "B$", "locale": "en-BS", "decimals": 2},
+    "BZD": {"name": "Belize Dollar", "symbol": "BZ$", "locale": "en-BZ", "decimals": 2},
+    "HTG": {"name": "Haitian Gourde", "symbol": "G", "locale": "fr-HT", "decimals": 2},
+    "CUP": {"name": "Cuban Peso", "symbol": "₱", "locale": "es-CU", "decimals": 2},
+    "AWG": {"name": "Aruban Florin", "symbol": "ƒ", "locale": "nl-AW", "decimals": 2},
+    "ANG": {"name": "Netherlands Antillean Guilder", "symbol": "ƒ", "locale": "nl-CW", "decimals": 2},
+    "SRD": {"name": "Surinamese Dollar", "symbol": "$", "locale": "nl-SR", "decimals": 2},
+    "GYD": {"name": "Guyanese Dollar", "symbol": "$", "locale": "en-GY", "decimals": 2},
+    "FJD": {"name": "Fijian Dollar", "symbol": "FJ$", "locale": "en-FJ", "decimals": 2},
+    "PGK": {"name": "Papua New Guinean Kina", "symbol": "K", "locale": "en-PG", "decimals": 2},
+    "WST": {"name": "Samoan Tala", "symbol": "WS$", "locale": "en-WS", "decimals": 2},
+    "TOP": {"name": "Tongan Paʻanga", "symbol": "T$", "locale": "to-TO", "decimals": 2},
+    "VUV": {"name": "Vanuatu Vatu", "symbol": "VT", "locale": "en-VU", "decimals": 0},
+    "SBD": {"name": "Solomon Islands Dollar", "symbol": "SI$", "locale": "en-SB", "decimals": 2},
+    "SCR": {"name": "Seychellois Rupee", "symbol": "₨", "locale": "en-SC", "decimals": 2},
+    "MUR": {"name": "Mauritian Rupee", "symbol": "₨", "locale": "en-MU", "decimals": 2},
+    "MVR": {"name": "Maldivian Rufiyaa", "symbol": "Rf", "locale": "dv-MV", "decimals": 2},
+    "BTN": {"name": "Bhutanese Ngultrum", "symbol": "Nu.", "locale": "dz-BT", "decimals": 2},
+    "KHR": {"name": "Cambodian Riel", "symbol": "៛", "locale": "km-KH", "decimals": 0},
+    "LAK": {"name": "Lao Kip", "symbol": "₭", "locale": "lo-LA", "decimals": 0},
+    "MNT": {"name": "Mongolian Tugrik", "symbol": "₮", "locale": "mn-MN", "decimals": 0},
+    "KPW": {"name": "North Korean Won", "symbol": "₩", "locale": "ko-KP", "decimals": 0},
+    "BND": {"name": "Brunei Dollar", "symbol": "B$", "locale": "ms-BN", "decimals": 2},
+    "MOP": {"name": "Macanese Pataca", "symbol": "MOP$", "locale": "zh-MO", "decimals": 2},
+    "ETB": {"name": "Ethiopian Birr", "symbol": "Br", "locale": "am-ET", "decimals": 2},
+    "ERN": {"name": "Eritrean Nakfa", "symbol": "Nfk", "locale": "ti-ER", "decimals": 2},
+    "DJF": {"name": "Djiboutian Franc", "symbol": "Fdj", "locale": "fr-DJ", "decimals": 0},
+    "SOS": {"name": "Somali Shilling", "symbol": "S", "locale": "so-SO", "decimals": 0},
+    "SDG": {"name": "Sudanese Pound", "symbol": "ج.س.", "locale": "ar-SD", "decimals": 2},
+    "SSP": {"name": "South Sudanese Pound", "symbol": "£", "locale": "en-SS", "decimals": 2},
+    "RWF": {"name": "Rwandan Franc", "symbol": "FRw", "locale": "rw-RW", "decimals": 0},
+    "BIF": {"name": "Burundian Franc", "symbol": "FBu", "locale": "rn-BI", "decimals": 0},
+    "CDF": {"name": "Congolese Franc", "symbol": "FC", "locale": "fr-CD", "decimals": 2},
+    "AOA": {"name": "Angolan Kwanza", "symbol": "Kz", "locale": "pt-AO", "decimals": 2},
+    "ZMW": {"name": "Zambian Kwacha", "symbol": "ZK", "locale": "en-ZM", "decimals": 2},
+    "MWK": {"name": "Malawian Kwacha", "symbol": "MK", "locale": "en-MW", "decimals": 2},
+    "MZN": {"name": "Mozambican Metical", "symbol": "MT", "locale": "pt-MZ", "decimals": 2},
+    "BWP": {"name": "Botswana Pula", "symbol": "P", "locale": "en-BW", "decimals": 2},
+    "NAD": {"name": "Namibian Dollar", "symbol": "N$", "locale": "en-NA", "decimals": 2},
+    "SZL": {"name": "Eswatini Lilangeni", "symbol": "E", "locale": "en-SZ", "decimals": 2},
+    "LSL": {"name": "Lesotho Loti", "symbol": "L", "locale": "en-LS", "decimals": 2},
+    "MGF": {"name": "Malagasy Ariary", "symbol": "Ar", "locale": "mg-MG", "decimals": 0},
+    "KMF": {"name": "Comorian Franc", "symbol": "CF", "locale": "ar-KM", "decimals": 0},
+    "CVE": {"name": "Cape Verdean Escudo", "symbol": "$", "locale": "pt-CV", "decimals": 2},
+    "STN": {"name": "São Tomé Dobra", "symbol": "Db", "locale": "pt-ST", "decimals": 2},
+    "GMD": {"name": "Gambian Dalasi", "symbol": "D", "locale": "en-GM", "decimals": 2},
+    "GNF": {"name": "Guinean Franc", "symbol": "FG", "locale": "fr-GN", "decimals": 0},
+    "SLL": {"name": "Sierra Leonean Leone", "symbol": "Le", "locale": "en-SL", "decimals": 0},
+    "LRD": {"name": "Liberian Dollar", "symbol": "L$", "locale": "en-LR", "decimals": 2},
+    "MRU": {"name": "Mauritanian Ouguiya", "symbol": "UM", "locale": "ar-MR", "decimals": 2},
+    "XPF": {"name": "CFP Franc", "symbol": "₣", "locale": "fr-PF", "decimals": 0},
+    "XCD": {"name": "East Caribbean Dollar", "symbol": "EC$", "locale": "en-AG", "decimals": 2},
+    "BMD": {"name": "Bermudian Dollar", "symbol": "$", "locale": "en-BM", "decimals": 2},
+    "KYD": {"name": "Cayman Islands Dollar", "symbol": "CI$", "locale": "en-KY", "decimals": 2},
+    "GIP": {"name": "Gibraltar Pound", "symbol": "£", "locale": "en-GI", "decimals": 2},
+    "FKP": {"name": "Falkland Islands Pound", "symbol": "£", "locale": "en-FK", "decimals": 2},
+    "SHP": {"name": "Saint Helena Pound", "symbol": "£", "locale": "en-SH", "decimals": 2},
+}
+
+# ============== EXCHANGE RATE SERVICE ==============
+class ExchangeRateService:
+    """Service to fetch, cache, and manage exchange rates"""
+    
+    def __init__(self, db):
+        self.db = db
+        self._rates_cache = {}
+        self._cache_expiry = None
+    
+    async def get_rates(self, base_currency: str = "USD") -> Dict[str, float]:
+        """Get exchange rates with caching"""
+        cache_key = f"rates_{base_currency}"
+        
+        # Check memory cache first
+        if self._rates_cache.get(cache_key) and self._cache_expiry and datetime.now(timezone.utc) < self._cache_expiry:
+            return self._rates_cache[cache_key]
+        
+        # Check database cache
+        cached = await self.db.exchange_rates.find_one(
+            {"base": base_currency},
+            {"_id": 0}
+        )
+        
+        if cached:
+            expires_at = datetime.fromisoformat(cached['expires_at'].replace('Z', '+00:00'))
+            if datetime.now(timezone.utc) < expires_at:
+                self._rates_cache[cache_key] = cached['rates']
+                self._cache_expiry = expires_at
+                return cached['rates']
+        
+        # Fetch fresh rates
+        try:
+            rates = await self._fetch_rates(base_currency)
+            await self._save_rates(base_currency, rates)
+            return rates
+        except Exception as e:
+            logger.error(f"Failed to fetch exchange rates: {e}")
+            # Try fallback
+            if cached:
+                return cached['rates']
+            return await self._get_fallback_rates(base_currency)
+    
+    async def _fetch_rates(self, base_currency: str) -> Dict[str, float]:
+        """Fetch rates from external API"""
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(f"{EXCHANGE_RATE_API_URL}/{base_currency}")
+            response.raise_for_status()
+            data = response.json()
+            return data.get('rates', {})
+    
+    async def _save_rates(self, base_currency: str, rates: Dict[str, float]):
+        """Save rates to database cache"""
+        now = datetime.now(timezone.utc)
+        expires = now + timedelta(seconds=EXCHANGE_RATE_CACHE_TTL)
+        
+        cache_doc = {
+            "base": base_currency,
+            "rates": rates,
+            "fetched_at": now.isoformat(),
+            "expires_at": expires.isoformat()
+        }
+        
+        await self.db.exchange_rates.update_one(
+            {"base": base_currency},
+            {"$set": cache_doc},
+            upsert=True
+        )
+        
+        # Update memory cache
+        self._rates_cache[f"rates_{base_currency}"] = rates
+        self._cache_expiry = expires
+    
+    async def _get_fallback_rates(self, base_currency: str) -> Dict[str, float]:
+        """Get fallback rates if API fails"""
+        # Basic fallback rates (approximate)
+        fallback = {
+            "USD": 1.0, "EUR": 0.92, "GBP": 0.79, "INR": 83.0, "JPY": 149.0,
+            "CNY": 7.24, "AUD": 1.53, "CAD": 1.36, "CHF": 0.88, "HKD": 7.82,
+            "SGD": 1.34, "KRW": 1320.0, "MXN": 17.2, "BRL": 4.97, "ZAR": 18.5
+        }
+        
+        if base_currency == "USD":
+            return fallback
+        
+        # Convert to requested base
+        if base_currency in fallback:
+            base_rate = fallback[base_currency]
+            return {k: v / base_rate for k, v in fallback.items()}
+        
+        return fallback
+    
+    async def convert(self, amount: float, from_currency: str, to_currency: str) -> tuple:
+        """Convert amount between currencies, returns (converted_amount, rate, timestamp)"""
+        if from_currency == to_currency:
+            return amount, 1.0, datetime.now(timezone.utc).isoformat()
+        
+        rates = await self.get_rates(from_currency)
+        rate = rates.get(to_currency, 1.0)
+        converted = amount * rate
+        
+        # Get timestamp from cache
+        cached = await self.db.exchange_rates.find_one({"base": from_currency}, {"_id": 0})
+        timestamp = cached.get('fetched_at', datetime.now(timezone.utc).isoformat()) if cached else datetime.now(timezone.utc).isoformat()
+        
+        return converted, rate, timestamp
+    
+    async def get_historical_rates(self, from_currency: str, to_currency: str, days: int = 30) -> List[Dict]:
+        """Get historical rates from database (simulated with slight variations)"""
+        # Note: Free APIs don't provide historical data, so we simulate based on current rate
+        current_rates = await self.get_rates(from_currency)
+        current_rate = current_rates.get(to_currency, 1.0)
+        
+        historical = []
+        base_date = datetime.now(timezone.utc)
+        
+        for i in range(days, -1, -1):
+            date = base_date - timedelta(days=i)
+            # Add slight random variation (±3%) to simulate historical movement
+            variation = 1 + (np.random.uniform(-0.03, 0.03))
+            rate = current_rate * variation
+            
+            historical.append({
+                "date": date.strftime("%Y-%m-%d"),
+                "rate": round(rate, 6),
+                "from": from_currency,
+                "to": to_currency
+            })
+        
+        return historical
+    
+    async def calculate_volatility(self, from_currency: str, to_currency: str, days: int = 30) -> Dict:
+        """Calculate FX volatility indicator"""
+        historical = await self.get_historical_rates(from_currency, to_currency, days)
+        rates = [h['rate'] for h in historical]
+        
+        if len(rates) < 2:
+            return {"volatility": 0, "trend": "stable", "change_percent": 0}
+        
+        # Calculate metrics
+        std_dev = np.std(rates)
+        mean_rate = np.mean(rates)
+        volatility = (std_dev / mean_rate) * 100 if mean_rate > 0 else 0
+        
+        # Calculate trend
+        first_rate = rates[0]
+        last_rate = rates[-1]
+        change_percent = ((last_rate - first_rate) / first_rate) * 100 if first_rate > 0 else 0
+        
+        if change_percent > 2:
+            trend = "strengthening"
+        elif change_percent < -2:
+            trend = "weakening"
+        else:
+            trend = "stable"
+        
+        return {
+            "volatility": round(volatility, 2),
+            "volatility_level": "high" if volatility > 5 else "medium" if volatility > 2 else "low",
+            "trend": trend,
+            "change_percent": round(change_percent, 2),
+            "period_days": days,
+            "high": round(max(rates), 6),
+            "low": round(min(rates), 6),
+            "average": round(mean_rate, 6)
+        }
+
 # ============== HELPER FUNCTIONS ==============
 def categorize_transaction(description: str) -> str:
     """Rule-based categorization of transactions"""
