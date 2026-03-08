@@ -1,0 +1,165 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Creative Designer",
+    "archetype": "The Performance Pro (Fintech Edition)",
+    "mission": "Create a high-performance, Excel-like financial tool that feels like a premium dark-mode IDE for money."
+  },
+  "typography": {
+    "primary_font": "Manrope",
+    "secondary_font": "Inter",
+    "mono_font": "JetBrains Mono",
+    "weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "bold": 700,
+      "black": 900
+    },
+    "usage": {
+      "headings": "Manrope (Bold/Black) - Tight tracking",
+      "body": "Inter (Regular/Medium) - Relaxed leading",
+      "data_grid": "JetBrains Mono (Regular) - Tabular nums",
+      "numbers": "JetBrains Mono (Medium)"
+    }
+  },
+  "colors": {
+    "theme": "dark",
+    "palette": {
+      "background": "#09090b",
+      "foreground": "#fafafa",
+      "card": "#18181b",
+      "card_foreground": "#fafafa",
+      "popover": "#09090b",
+      "popover_foreground": "#fafafa",
+      "primary": "#3b82f6",
+      "primary_foreground": "#ffffff",
+      "secondary": "#27272a",
+      "secondary_foreground": "#fafafa",
+      "muted": "#27272a",
+      "muted_foreground": "#a1a1aa",
+      "accent": "#27272a",
+      "accent_foreground": "#fafafa",
+      "destructive": "#ef4444",
+      "destructive_foreground": "#fafafa",
+      "border": "#27272a",
+      "input": "#27272a",
+      "ring": "#3b82f6",
+      "chart_1": "#3b82f6",
+      "chart_2": "#22c55e",
+      "chart_3": "#eab308",
+      "chart_4": "#f97316",
+      "chart_5": "#8b5cf6"
+    },
+    "semantic": {
+      "profit": "#22c55e",
+      "loss": "#ef4444",
+      "warning": "#eab308",
+      "info": "#3b82f6",
+      "grid_line": "#27272a",
+      "grid_header": "#18181b"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": {
+      "header": "bg-background/70 backdrop-blur-xl border-b border-white/10",
+      "overlay": "bg-black/60 backdrop-blur-sm"
+    },
+    "borders": {
+      "default": "border border-border",
+      "active": "border-primary/50",
+      "subtle": "border-white/5"
+    },
+    "shadows": {
+      "card": "shadow-lg shadow-black/20",
+      "glow": "shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+    },
+    "gradients": {
+      "hero_text": "bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/50",
+      "active_item": "bg-gradient-to-r from-primary/10 to-transparent"
+    }
+  },
+  "layout": {
+    "spacing_scale": "Generous (p-6, p-8) for dashboard containers, Dense (p-2, p-3) for data grids",
+    "container": "max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8",
+    "grid_system": {
+      "dashboard": "grid grid-cols-1 md:grid-cols-4 gap-6",
+      "bento_mode": "Mode B (High Density)",
+      "spreadsheet": "w-full h-full overflow-auto"
+    },
+    "border_radius": {
+      "outer": "rounded-xl",
+      "inner": "rounded-lg",
+      "input": "rounded-md",
+      "button": "rounded-md"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow transition-all duration-300",
+      "secondary": "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+      "ghost": "hover:bg-accent hover:text-accent-foreground",
+      "outline": "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+    },
+    "cards": {
+      "base": "bg-card text-card-foreground rounded-xl border border-border shadow-card",
+      "hover": "hover:border-primary/30 transition-colors duration-300"
+    },
+    "inputs": {
+      "base": "bg-input/50 border-transparent focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 font-mono text-sm"
+    },
+    "data_grid": {
+      "header": "bg-muted/50 text-muted-foreground font-medium text-xs uppercase tracking-wider border-b border-border",
+      "cell": "border-b border-border/50 p-2 font-mono text-sm",
+      "row_hover": "hover:bg-muted/30"
+    }
+  },
+  "motion": {
+    "transitions": "transition-all duration-200 ease-out",
+    "hover_lift": "hover:-translate-y-1",
+    "page_enter": "animate-in fade-in slide-in-from-bottom-4 duration-500",
+    "list_stagger": "stagger-children-100"
+  },
+  "accessibility": {
+    "contrast": "WCAG AA compliant (4.5:1 for normal text)",
+    "focus_states": "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+    "reduced_motion": "respects prefers-reduced-motion"
+  },
+  "image_urls": {
+    "hero_background": "https://images.unsplash.com/photo-1772056385554-be8bbb0e92e2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGZpbmFuY2lhbCUyMGRhdGElMjB2aXN1YWxpemF0aW9uJTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcyOTQxMDk5fDA&ixlib=rb-4.1.0&q=85",
+    "abstract_texture": "https://images.unsplash.com/photo-1771226281112-b7119ef4112e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMGZpbmFuY2lhbCUyMGRhdGElMjB2aXN1YWxpemF0aW9uJTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcyOTQxMDk5fDA&ixlib=rb-4.1.0&q=85",
+    "login_bg": "https://images.unsplash.com/photo-1771013304380-dfaf9f928de6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGZpbmFuY2lhbCUyMGRhdGElMjB2aXN1YWxpemF0aW9uJTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzcyOTQxMDk5fDA&ixlib=rb-4.1.0&q=85"
+  },
+  "instructions_to_main_agent": [
+    "Implement the 'Performance Pro' dark theme immediately by updating CSS variables.",
+    "Use 'Manrope' for all headings and 'JetBrains Mono' for all financial data/numbers.",
+    "Build the Dashboard using the 'Bento Grid Mode B' (High Density) layout.",
+    "Ensure the Spreadsheet View feels like a native app: dense, borders, monospace font.",
+    "Use the provided image URLs for backgrounds or empty states only; do not clutter the UI with images.",
+    "Apply 'glassmorphism' to the top navigation bar.",
+    "Use 'sonner' for all toast notifications.",
+    "Add 'data-testid' to all interactive elements.",
+    "Do not use gradients for backgrounds, only for subtle accents or text.",
+    "Ensure all charts use the defined chart colors (chart_1 to chart_5)."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Create new components that match the style and conventions of existing components when needed",
+    "Examine existing components to understand the project's component patterns before creating new ones",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use 'sonner' for toasts. Sonner component are located in /app/src/components/ui/sonner.tsx"
+  ]
+}
