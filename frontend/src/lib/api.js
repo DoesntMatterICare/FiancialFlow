@@ -158,4 +158,85 @@ export const getCountries = async () => {
   return response.data;
 };
 
+// ============== EXCHANGE RATE & CONVERSION APIs ==============
+export const getExchangeRates = async (baseCurrency = 'USD') => {
+  const response = await api.get(`/exchange/rates/${baseCurrency}`);
+  return response.data;
+};
+
+export const convertCurrency = async (amount, fromCurrency, toCurrency) => {
+  const response = await api.post('/exchange/convert', {
+    amount,
+    from_currency: fromCurrency,
+    to_currency: toCurrency
+  });
+  return response.data;
+};
+
+export const batchConvertCurrencies = async (conversions) => {
+  const response = await api.post('/exchange/batch-convert', { conversions });
+  return response.data;
+};
+
+export const getHistoricalRates = async (fromCurrency, toCurrency, days = 30) => {
+  const response = await api.get(`/exchange/historical/${fromCurrency}/${toCurrency}`, {
+    params: { days }
+  });
+  return response.data;
+};
+
+export const getFxVolatility = async (fromCurrency, toCurrency, days = 30) => {
+  const response = await api.get(`/exchange/volatility/${fromCurrency}/${toCurrency}`, {
+    params: { days }
+  });
+  return response.data;
+};
+
+export const getAllCurrencies = async () => {
+  const response = await api.get('/exchange/currencies/all');
+  return response.data;
+};
+
+export const getPopularCurrencies = async () => {
+  const response = await api.get('/exchange/popular');
+  return response.data;
+};
+
+// Portfolio
+export const getPortfolioAssets = async () => {
+  const response = await api.get('/portfolio/assets');
+  return response.data;
+};
+
+export const createPortfolioAsset = async (data) => {
+  const response = await api.post('/portfolio/assets', data);
+  return response.data;
+};
+
+export const deletePortfolioAsset = async (id) => {
+  const response = await api.delete(`/portfolio/assets/${id}`);
+  return response.data;
+};
+
+export const getPortfolioSummary = async (baseCurrency = 'INR') => {
+  const response = await api.get('/portfolio/summary', {
+    params: { base_currency: baseCurrency }
+  });
+  return response.data;
+};
+
+export const getPortfolioAllocation = async (baseCurrency = 'INR') => {
+  const response = await api.get('/portfolio/allocation', {
+    params: { base_currency: baseCurrency }
+  });
+  return response.data;
+};
+
+export const getTransactionsConverted = async (baseCurrency = 'INR', limit = 100) => {
+  const response = await api.get('/transactions/converted', {
+    params: { base_currency: baseCurrency, limit }
+  });
+  return response.data;
+};
+
 export default api;
