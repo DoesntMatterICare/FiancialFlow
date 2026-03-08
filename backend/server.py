@@ -14,12 +14,19 @@ import io
 import csv
 import json
 from enum import Enum
+import httpx
+import asyncio
 
 # File parsing imports
 import openpyxl
 import PyPDF2
 import pandas as pd
 import numpy as np
+
+# ============== EXCHANGE RATE CONFIG ==============
+EXCHANGE_RATE_API_URL = "https://api.exchangerate-api.com/v4/latest"
+EXCHANGE_RATE_CACHE_TTL = 3600  # 1 hour in seconds
+FALLBACK_RATES_FILE = Path(__file__).parent / "fallback_rates.json"
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
