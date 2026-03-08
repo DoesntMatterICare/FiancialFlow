@@ -35,10 +35,12 @@ import {
   getInvestmentSuggestions 
 } from "@/lib/api";
 import { toast } from "sonner";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const CHART_COLORS = ['#3b82f6', '#22c55e', '#eab308', '#f97316', '#8b5cf6', '#ec4899', '#06b6d4'];
 
 export const Analytics = () => {
+  const { formatCurrency } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState(null);
   const [cashFlow, setCashFlow] = useState([]);
@@ -160,7 +162,7 @@ export const Analytics = () => {
                           stroke="hsl(240 5% 65%)"
                           fontSize={12}
                           tickLine={false}
-                          tickFormatter={(value) => `$${value / 1000}k`}
+                          tickFormatter={(value) => formatCurrency(value, { compact: true })}
                         />
                         <Tooltip 
                           contentStyle={{
