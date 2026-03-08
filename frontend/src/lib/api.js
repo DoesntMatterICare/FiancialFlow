@@ -85,6 +85,13 @@ export const getAnalyticsSummary = async () => {
   return response.data;
 };
 
+export const getAnalyticsSummaryConverted = async (baseCurrency = 'INR') => {
+  const response = await api.get('/analytics/summary/converted', {
+    params: { base_currency: baseCurrency }
+  });
+  return response.data;
+};
+
 export const getCashFlowForecast = async (months = 6) => {
   const response = await api.get('/analytics/cash-flow', { params: { months } });
   return response.data;
