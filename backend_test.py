@@ -229,6 +229,148 @@ class FinanceFlowAPITester:
 
         return True
 
+    def test_currency_conversion_apis(self):
+        """Test currency conversion and exchange rate APIs"""
+        print("\n💱 Testing Currency Conversion APIs...")
+        
+        # Test get all currencies (should return 160+ currencies)
+        success, response = self.run_test("Get All Currencies", "GET", "exchange/currencies/all", 200)
+        if not success:
+            return False
+        
+        currencies = response.get('currencies', [])
+        if len(currencies) < 160:
+            print(f"❌ Expected 160+ currencies, got {len(currencies)}")
+            return False
+        else:
+            print(f"✅ Found {len(currencies)} currencies")
+        
+        # Test get popular currencies
+        success, response = self.run_test("Get Popular Currencies", "GET", "exchange/popular", 200)
+        if not success:
+            return False
+        
+        # Test get exchange rates for USD
+        success, response = self.run_test("Get USD Exchange Rates", "GET", "exchange/rates/USD", 200)
+        if not success:
+            return False
+        
+        rates = response.get('rates', {})
+        if len(rates) < 50:  # Should have many rates
+            print(f"❌ Expected many exchange rates, got {len(rates)}")
+            return False
+        else:
+            print(f"✅ Found {len(rates)} exchange rates")
+        
+        # Test currency conversion USD to INR
+        conversion_data = {
+            "amount": 1000.0,
+            "from_currency": "USD",
+            "to_currency": "INR"
+        }
+        success, response = self.run_test("Convert USD to INR", "POST", "exchange/convert", 200, conversion_data)
+        if not success:
+            return False
+        
+        # Verify conversion response structure
+        required_fields = ['original_amount', 'converted_amount', 'exchange_rate', 'formatted_original', 'formatted_converted']
+        for field in required_fields:
+            if field not in response:
+                print(f"❌ Missing field in conversion response: {field}")
+                return False
+        
+        print(f"✅ Conversion: {response.get('formatted_original')} = {response.get('formatted_converted')}")
+        
+        # Test historical rates
+        success, response = self.run_test("Get Historical Rates USD/INR", "GET", "exchange/historical/USD/INR", 200, params={"days": 30})
+        if not success:
+            return False
+        
+        historical_data = response.get('data', [])
+        if len(historical_data) < 25:  # Should have ~30 days of data
+            print(f"❌ Expected ~30 days of historical data, got {len(historical_data)}")
+            return False
+        else:
+            print(f"✅ Found {len(historical_data)} days of historical data")
+        
+        # Test volatility calculation
+        success, response = self.run_test("Get FX Volatility USD/INR", "GET", "exchange/volatility/USD/INR", 200, params={"days": 30})
+        if not success:
+            return False
+        
+        # Verify volatility response structure
+        volatility_fields = ['volatility', 'volatility_level', 'trend', 'change_percent']
+        for field in volatility_fields:
+            if field not in response:
+                print(f"❌ Missing field in volatility response: {field}")
+                return False
+        
+        print(f"✅ Volatility: {response.get('volatility')}% ({response.get('volatility_level')})")
+        
+        # Test batch conversion
+        batch_data = {
+            "conversions": [
+                {"amount": 100, "from_currency": "USD", "to_currency": "EUR"},
+                {"amount": 200, "from_currency": "GBP", "to_currency": "JPY"}
+            ]
+        }
+        success, response = self.run_test("Batch Currency Conversion", "POST", "exchange/batch-convert", 200, batch_data)
+        if not success:
+            return False
+        
+        conversions = response.get('conversions', [])
+        if len(conversions) != 2:
+            print(f"❌ Expected 2 batch conversions, got {len(conversions)}")
+            return False
+        
+        return True
+
+    def test_portfolio_apis(self):
+        """Test portfolio management APIs"""
+        print("\n💼 Testing Portfolio APIs...")
+        
+        # Test get empty portfolio
+        success, _ = self.run_test("Get Portfolio Assets", "GET", "portfolio/assets", 200)
+        if not success:
+            return False
+        
+        # Test create portfolio asset
+        asset_data = {
+            "name": "Test USD Savings",
+            "amount": 5000.0,
+            "currency": "USD",
+            "category": "Cash",
+            "notes": "Test asset"
+        }
+        success, response = self.run_test("Create Portfolio Asset", "POST", "portfolio/assets", 200, asset_data)
+        if not success:
+            return False
+        
+        asset_id = response.get('id')
+        if asset_id:
+            print(f"   Created asset ID: {asset_id}")
+        
+        # Test portfolio summary
+        success, response = self.run_test("Get Portfolio Summary", "GET", "portfolio/summary", 200, params={"base_currency": "USD"})
+        if not success:
+            return False
+        
+        # Test portfolio allocation
+        success, response = self.run_test("Get Portfolio Allocation", "GET", "portfolio/allocation", 200, params={"base_currency": "USD"})
+        if not success:
+            return False
+        
+        # Test converted transactions
+        success, response = self.run_test("Get Converted Transactions", "GET", "transactions/converted", 200, params={"base_currency": "USD"})
+        if not success:
+            return False
+        
+        # Clean up created asset
+        if asset_id:
+            self.run_test(f"Delete Portfolio Asset {asset_id}", "DELETE", f"portfolio/assets/{asset_id}", 200)
+        
+        return True
+
     def cleanup(self):
         """Clean up created test data"""
         print("\n🧹 Cleaning up test data...")
