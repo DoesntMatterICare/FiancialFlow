@@ -1275,9 +1275,6 @@ async def get_analytics_summary_converted(base_currency: str = Query(default="IN
     service = get_exchange_service()
     transactions = await db.transactions.find({}, {"_id": 0}).to_list(5000)
     
-    # Get user's default currency (the currency transactions were entered in)
-    settings = await db.settings.find_one({"id": "default"}, {"_id": 0})
-    source_currency = settings.get("currency", "USD") if settings else "USD"
     base_curr = base_currency.upper()
     
     if not transactions:
@@ -1292,24 +1289,37 @@ async def get_analytics_summary_converted(base_currency: str = Query(default="IN
             "converted": True
         }
     
-    # Get conversion rate
-    if source_currency != base_curr:
-        _, rate, _ = await service.convert(1, source_currency, base_curr)
-    else:
-        rate = 1.0
+    # Determine source currency for each transaction
+    # If transaction has original_currency, use it; otherwise assume USD
+    async def get_converted_amount(amount: float, tx_currency: str) -> float:
+        if tx_currency == base_curr:
+            return amount
+        _, rate, _ = await service.convert(1, tx_currency, base_curr)
+        return amount * rate
     
     # Calculate totals with conversion
     income_txns = [t for t in transactions if t['type'] == 'income']
     expense_txns = [t for t in transactions if t['type'] == 'expense']
     
-    total_income = sum(t['amount'] for t in income_txns) * rate
-    total_expenses = sum(t['amount'] for t in expense_txns) * rate
+    total_income = 0
+    total_expenses = 0
+    
+    for t in income_txns:
+        tx_currency = t.get('original_currency', 'USD')
+        converted = await get_converted_amount(t['amount'], tx_currency)
+        total_income += converted
+    
+    for t in expense_txns:
+        tx_currency = t.get('original_currency', 'USD')
+        converted = await get_converted_amount(t['amount'], tx_currency)
+        total_expenses += converted
     
     # Top expense categories (converted)
     category_totals = {}
     for t in expense_txns:
         cat = t['category']
-        converted_amount = t['amount'] * rate
+        tx_currency = t.get('original_currency', 'USD')
+        converted_amount = await get_converted_amount(t['amount'], tx_currency)
         category_totals[cat] = category_totals.get(cat, 0) + converted_amount
     
     top_categories = sorted(
@@ -1324,7 +1334,8 @@ async def get_analytics_summary_converted(base_currency: str = Query(default="IN
         month = t['date'][:7]
         if month not in monthly_data:
             monthly_data[month] = {'income': 0, 'expense': 0}
-        converted_amount = t['amount'] * rate
+        tx_currency = t.get('original_currency', 'USD')
+        converted_amount = await get_converted_amount(t['amount'], tx_currency)
         if t['type'] == 'income':
             monthly_data[month]['income'] += converted_amount
         else:
@@ -1348,9 +1359,7 @@ async def get_analytics_summary_converted(base_currency: str = Query(default="IN
         "top_categories": top_categories,
         "monthly_trend": monthly_trend,
         "currency": base_curr,
-        "exchange_rate": rate,
-        "source_currency": source_currency,
-        "converted": source_currency != base_curr
+        "converted": True
     }
 
 @api_router.get("/analytics/cash-flow")
