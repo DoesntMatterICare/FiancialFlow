@@ -23,7 +23,7 @@ import {
   Pie,
   Cell
 } from "recharts";
-import { getAnalyticsSummary, getCashFlowForecast, getAnomalies, getBudgetStatus } from "@/lib/api";
+import { getAnalyticsSummaryConverted, getCashFlowForecast, getAnomalies, getBudgetStatus } from "@/lib/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useCurrency } from "@/context/CurrencyContext";
@@ -32,18 +32,18 @@ const CHART_COLORS = ['#3b82f6', '#22c55e', '#eab308', '#f97316', '#8b5cf6'];
 
 export const Dashboard = () => {
   const navigate = useNavigate();
-  const { formatCurrency, getCurrencySymbol } = useCurrency();
+  const { formatCurrency, getCurrencySymbol, currency } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState(null);
   const [cashFlow, setCashFlow] = useState([]);
   const [anomalies, setAnomalies] = useState([]);
   const [budgetStatus, setBudgetStatus] = useState([]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [summaryData, cashFlowData, anomaliesData, budgetData] = await Promise.all([
-        getAnalyticsSummary(),
+        getAnalyticsSummaryConverted(currency),
         getCashFlowForecast(6),
         getAnomalies(),
         getBudgetStatus()
@@ -59,11 +59,11 @@ export const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currency]);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   if (loading) {
     return (
