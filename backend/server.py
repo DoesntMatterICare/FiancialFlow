@@ -161,6 +161,54 @@ class UserSettingsUpdate(BaseModel):
     country: Optional[str] = None
     locale: Optional[str] = None
 
+# ============== CURRENCY CONVERSION MODELS ==============
+class ExchangeRateCache(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    base: str
+    rates: Dict[str, float]
+    fetched_at: str
+    expires_at: str
+
+class CurrencyConversionRequest(BaseModel):
+    amount: float
+    from_currency: str
+    to_currency: str
+
+class CurrencyConversionResponse(BaseModel):
+    original_amount: float
+    original_currency: str
+    converted_amount: float
+    target_currency: str
+    exchange_rate: float
+    formatted_original: str
+    formatted_converted: str
+    rate_timestamp: str
+
+class BatchConversionRequest(BaseModel):
+    conversions: List[CurrencyConversionRequest]
+
+class PortfolioAsset(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    amount: float
+    currency: str
+    category: str = "Cash"
+    notes: str = ""
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class PortfolioAssetCreate(BaseModel):
+    name: str
+    amount: float
+    currency: str
+    category: str = "Cash"
+    notes: str = ""
+
+class HistoricalRateRequest(BaseModel):
+    from_currency: str
+    to_currency: str
+    days: int = 30
+
 # ============== CATEGORY RULES ==============
 CATEGORY_RULES = {
     "salary": Category.SALARY,
