@@ -415,6 +415,14 @@ class FinanceFlowAPITester:
             
             if not self.test_reports():
                 return False
+            
+            # Test currency conversion APIs
+            if not self.test_currency_conversion_apis():
+                return False
+            
+            # Test portfolio APIs
+            if not self.test_portfolio_apis():
+                return False
 
             return True
 
