@@ -7,8 +7,10 @@ import {
   Calculator, 
   FileText, 
   Upload,
-  TrendingUp
+  TrendingUp,
+  Settings
 } from "lucide-react";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const navItems = [
   { path: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -18,10 +20,12 @@ const navItems = [
   { path: "/tax", icon: Calculator, label: "Tax Estimator" },
   { path: "/reports", icon: FileText, label: "Reports" },
   { path: "/import", icon: Upload, label: "Import Data" },
+  { path: "/settings", icon: Settings, label: "Settings" },
 ];
 
 export const Layout = () => {
   const location = useLocation();
+  const { currency, getCurrencySymbol } = useCurrency();
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -58,7 +62,7 @@ export const Layout = () => {
 
         <div className="p-4 border-t border-border">
           <div className="text-xs text-muted-foreground text-center hidden lg:block">
-            No AI Required
+            <span className="font-mono">{getCurrencySymbol()}</span> {currency}
           </div>
         </div>
       </aside>
