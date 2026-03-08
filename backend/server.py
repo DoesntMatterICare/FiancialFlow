@@ -1548,6 +1548,341 @@ async def get_categories():
     """Get all available categories"""
     return {"categories": [c.value for c in Category]}
 
+# ============== CURRENCY CONVERSION ENDPOINTS ==============
+# Initialize exchange rate service
+exchange_service = None
+
+@api_router.on_event("startup")
+async def init_exchange_service():
+    global exchange_service
+    exchange_service = ExchangeRateService(db)
+
+def get_exchange_service():
+    global exchange_service
+    if exchange_service is None:
+        exchange_service = ExchangeRateService(db)
+    return exchange_service
+
+def format_currency_value(amount: float, currency_code: str) -> str:
+    """Format currency value based on currency conventions"""
+    currency_info = ALL_CURRENCIES.get(currency_code, {"symbol": currency_code, "decimals": 2})
+    symbol = currency_info.get("symbol", currency_code)
+    decimals = currency_info.get("decimals", 2)
+    
+    formatted_num = f"{amount:,.{decimals}f}"
+    return f"{symbol}{formatted_num}"
+
+@api_router.get("/exchange/rates/{base_currency}")
+async def get_exchange_rates(base_currency: str = "USD"):
+    """Get current exchange rates for a base currency"""
+    service = get_exchange_service()
+    rates = await service.get_rates(base_currency.upper())
+    
+    # Get cache info
+    cached = await db.exchange_rates.find_one({"base": base_currency.upper()}, {"_id": 0})
+    
+    return {
+        "base": base_currency.upper(),
+        "rates": rates,
+        "fetched_at": cached.get("fetched_at") if cached else datetime.now(timezone.utc).isoformat(),
+        "expires_at": cached.get("expires_at") if cached else None,
+        "currency_count": len(rates)
+    }
+
+@api_router.post("/exchange/convert", response_model=CurrencyConversionResponse)
+async def convert_currency(request: CurrencyConversionRequest):
+    """Convert amount from one currency to another"""
+    service = get_exchange_service()
+    
+    from_curr = request.from_currency.upper()
+    to_curr = request.to_currency.upper()
+    
+    converted, rate, timestamp = await service.convert(
+        request.amount, 
+        from_curr, 
+        to_curr
+    )
+    
+    return CurrencyConversionResponse(
+        original_amount=request.amount,
+        original_currency=from_curr,
+        converted_amount=round(converted, ALL_CURRENCIES.get(to_curr, {}).get("decimals", 2)),
+        target_currency=to_curr,
+        exchange_rate=rate,
+        formatted_original=format_currency_value(request.amount, from_curr),
+        formatted_converted=format_currency_value(converted, to_curr),
+        rate_timestamp=timestamp
+    )
+
+@api_router.post("/exchange/batch-convert")
+async def batch_convert_currencies(request: BatchConversionRequest):
+    """Convert multiple amounts in batch"""
+    service = get_exchange_service()
+    results = []
+    
+    for conv in request.conversions:
+        from_curr = conv.from_currency.upper()
+        to_curr = conv.to_currency.upper()
+        
+        converted, rate, timestamp = await service.convert(
+            conv.amount, from_curr, to_curr
+        )
+        
+        results.append({
+            "original_amount": conv.amount,
+            "original_currency": from_curr,
+            "converted_amount": round(converted, ALL_CURRENCIES.get(to_curr, {}).get("decimals", 2)),
+            "target_currency": to_curr,
+            "exchange_rate": rate,
+            "formatted_original": format_currency_value(conv.amount, from_curr),
+            "formatted_converted": format_currency_value(converted, to_curr)
+        })
+    
+    return {"conversions": results, "count": len(results)}
+
+@api_router.get("/exchange/historical/{from_currency}/{to_currency}")
+async def get_historical_rates(
+    from_currency: str, 
+    to_currency: str, 
+    days: int = Query(default=30, le=365)
+):
+    """Get historical exchange rates"""
+    service = get_exchange_service()
+    historical = await service.get_historical_rates(
+        from_currency.upper(), 
+        to_currency.upper(), 
+        days
+    )
+    
+    return {
+        "from": from_currency.upper(),
+        "to": to_currency.upper(),
+        "period_days": days,
+        "data": historical
+    }
+
+@api_router.get("/exchange/volatility/{from_currency}/{to_currency}")
+async def get_fx_volatility(
+    from_currency: str, 
+    to_currency: str, 
+    days: int = Query(default=30, le=365)
+):
+    """Get FX volatility indicator"""
+    service = get_exchange_service()
+    volatility = await service.calculate_volatility(
+        from_currency.upper(), 
+        to_currency.upper(), 
+        days
+    )
+    
+    return {
+        "pair": f"{from_currency.upper()}/{to_currency.upper()}",
+        **volatility
+    }
+
+@api_router.get("/exchange/currencies/all")
+async def get_all_currencies():
+    """Get all 160+ supported currencies with details"""
+    currencies = []
+    for code, info in ALL_CURRENCIES.items():
+        currencies.append({
+            "code": code,
+            "name": info["name"],
+            "symbol": info["symbol"],
+            "decimals": info["decimals"],
+            "locale": info.get("locale", "en-US")
+        })
+    
+    # Sort by code
+    currencies.sort(key=lambda x: x["code"])
+    
+    return {
+        "currencies": currencies,
+        "total": len(currencies)
+    }
+
+@api_router.get("/exchange/popular")
+async def get_popular_currencies():
+    """Get popular currencies for quick access"""
+    popular_codes = ["USD", "EUR", "GBP", "INR", "JPY", "CNY", "AUD", "CAD", "CHF", "SGD", "AED", "SAR", "KRW", "MXN", "BRL"]
+    
+    currencies = []
+    for code in popular_codes:
+        if code in ALL_CURRENCIES:
+            info = ALL_CURRENCIES[code]
+            currencies.append({
+                "code": code,
+                "name": info["name"],
+                "symbol": info["symbol"]
+            })
+    
+    return {"currencies": currencies}
+
+# ============== MULTI-CURRENCY PORTFOLIO ==============
+@api_router.post("/portfolio/assets", response_model=PortfolioAsset)
+async def create_portfolio_asset(input: PortfolioAssetCreate):
+    """Add asset to multi-currency portfolio"""
+    asset_dict = input.model_dump()
+    asset_dict['id'] = str(uuid.uuid4())
+    asset_dict['currency'] = input.currency.upper()
+    asset_dict['created_at'] = datetime.now(timezone.utc).isoformat()
+    
+    await db.portfolio_assets.insert_one(asset_dict)
+    return PortfolioAsset(**asset_dict)
+
+@api_router.get("/portfolio/assets")
+async def get_portfolio_assets():
+    """Get all portfolio assets"""
+    assets = await db.portfolio_assets.find({}, {"_id": 0}).to_list(500)
+    return {"assets": assets, "count": len(assets)}
+
+@api_router.delete("/portfolio/assets/{asset_id}")
+async def delete_portfolio_asset(asset_id: str):
+    """Delete a portfolio asset"""
+    result = await db.portfolio_assets.delete_one({"id": asset_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Asset not found")
+    return {"message": "Asset deleted successfully"}
+
+@api_router.get("/portfolio/summary")
+async def get_portfolio_summary(base_currency: str = Query(default="INR")):
+    """Get portfolio summary converted to base currency"""
+    service = get_exchange_service()
+    assets = await db.portfolio_assets.find({}, {"_id": 0}).to_list(500)
+    
+    base_curr = base_currency.upper()
+    total_base = 0
+    by_currency = {}
+    by_category = {}
+    converted_assets = []
+    
+    for asset in assets:
+        currency = asset['currency']
+        amount = asset['amount']
+        category = asset.get('category', 'Other')
+        
+        # Track by original currency
+        if currency not in by_currency:
+            by_currency[currency] = {"total": 0, "assets": 0}
+        by_currency[currency]["total"] += amount
+        by_currency[currency]["assets"] += 1
+        
+        # Convert to base currency
+        if currency == base_curr:
+            converted = amount
+            rate = 1.0
+        else:
+            converted, rate, _ = await service.convert(amount, currency, base_curr)
+        
+        total_base += converted
+        
+        # Track by category
+        if category not in by_category:
+            by_category[category] = 0
+        by_category[category] += converted
+        
+        converted_assets.append({
+            **asset,
+            "converted_amount": round(converted, 2),
+            "converted_currency": base_curr,
+            "exchange_rate": rate,
+            "formatted_original": format_currency_value(amount, currency),
+            "formatted_converted": format_currency_value(converted, base_curr)
+        })
+    
+    return {
+        "base_currency": base_curr,
+        "total_value": round(total_base, 2),
+        "formatted_total": format_currency_value(total_base, base_curr),
+        "asset_count": len(assets),
+        "by_currency": by_currency,
+        "by_category": {k: round(v, 2) for k, v in by_category.items()},
+        "assets": converted_assets
+    }
+
+@api_router.get("/portfolio/allocation")
+async def get_portfolio_allocation(base_currency: str = Query(default="INR")):
+    """Get portfolio allocation by currency and category"""
+    summary = await get_portfolio_summary(base_currency)
+    
+    total = summary["total_value"]
+    if total == 0:
+        return {"currency_allocation": [], "category_allocation": []}
+    
+    # Currency allocation
+    currency_alloc = []
+    for code, data in summary["by_currency"].items():
+        service = get_exchange_service()
+        converted, _, _ = await service.convert(data["total"], code, base_currency.upper())
+        percentage = (converted / total) * 100 if total > 0 else 0
+        currency_alloc.append({
+            "currency": code,
+            "original_value": data["total"],
+            "converted_value": round(converted, 2),
+            "percentage": round(percentage, 2),
+            "asset_count": data["assets"]
+        })
+    
+    # Sort by percentage
+    currency_alloc.sort(key=lambda x: x["percentage"], reverse=True)
+    
+    # Category allocation
+    category_alloc = []
+    for category, value in summary["by_category"].items():
+        percentage = (value / total) * 100 if total > 0 else 0
+        category_alloc.append({
+            "category": category,
+            "value": round(value, 2),
+            "percentage": round(percentage, 2)
+        })
+    
+    category_alloc.sort(key=lambda x: x["percentage"], reverse=True)
+    
+    return {
+        "base_currency": base_currency.upper(),
+        "total_value": round(total, 2),
+        "currency_allocation": currency_alloc,
+        "category_allocation": category_alloc
+    }
+
+# ---------- TRANSACTIONS WITH MULTI-CURRENCY SUPPORT ----------
+@api_router.get("/transactions/converted")
+async def get_transactions_converted(
+    base_currency: str = Query(default="INR"),
+    limit: int = Query(default=100, le=1000)
+):
+    """Get transactions with converted amounts to base currency"""
+    service = get_exchange_service()
+    transactions = await db.transactions.find({}, {"_id": 0}).sort("date", -1).to_list(limit)
+    
+    base_curr = base_currency.upper()
+    converted_txns = []
+    
+    # Get user settings for original currency (assume USD if not stored)
+    settings = await db.settings.find_one({"id": "default"}, {"_id": 0})
+    default_currency = settings.get("currency", "USD") if settings else "USD"
+    
+    for tx in transactions:
+        original_currency = tx.get("original_currency", default_currency)
+        amount = tx['amount']
+        
+        if original_currency == base_curr:
+            converted = amount
+            rate = 1.0
+        else:
+            converted, rate, _ = await service.convert(amount, original_currency, base_curr)
+        
+        converted_txns.append({
+            **tx,
+            "original_currency": original_currency,
+            "converted_amount": round(converted, 2),
+            "converted_currency": base_curr,
+            "exchange_rate": rate,
+            "display": f"{format_currency_value(amount, original_currency)} ≈ {format_currency_value(converted, base_curr)}"
+        })
+    
+    return {"transactions": converted_txns, "base_currency": base_curr}
+
 # Include the router in the main app
 app.include_router(api_router)
 
