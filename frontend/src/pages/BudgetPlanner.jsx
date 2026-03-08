@@ -34,8 +34,10 @@ import {
   getCategories 
 } from "@/lib/api";
 import { toast } from "sonner";
+import { useCurrency } from "@/context/CurrencyContext";
 
 export const BudgetPlanner = () => {
+  const { formatCurrency, getCurrencySymbol } = useCurrency();
   const [budgets, setBudgets] = useState([]);
   const [budgetStatus, setBudgetStatus] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -192,7 +194,7 @@ export const BudgetPlanner = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="limit">Budget Limit</Label>
+                <Label htmlFor="limit">Budget Limit ({getCurrencySymbol()})</Label>
                 <Input
                   id="limit"
                   type="number"
