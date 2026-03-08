@@ -10,6 +10,7 @@ import TaxEstimator from "@/pages/TaxEstimator";
 import Reports from "@/pages/Reports";
 import ImportData from "@/pages/ImportData";
 import Settings from "@/pages/Settings";
+import CurrencyConverter from "@/pages/CurrencyConverter";
 import "@/App.css";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="transactions" element={<Transactions />} />
             <Route path="analytics" element={<Analytics />} />
+            <Route path="converter" element={<CurrencyConverter />} />
             <Route path="budget" element={<BudgetPlanner />} />
             <Route path="tax" element={<TaxEstimator />} />
             <Route path="reports" element={<Reports />} />
