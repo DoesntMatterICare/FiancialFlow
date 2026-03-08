@@ -26,11 +26,13 @@ import {
 import { getAnalyticsSummary, getCashFlowForecast, getAnomalies, getBudgetStatus } from "@/lib/api";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const CHART_COLORS = ['#3b82f6', '#22c55e', '#eab308', '#f97316', '#8b5cf6'];
 
 export const Dashboard = () => {
   const navigate = useNavigate();
+  const { formatCurrency, getCurrencySymbol } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState(null);
   const [cashFlow, setCashFlow] = useState([]);
@@ -62,15 +64,6 @@ export const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value);
-  };
 
   if (loading) {
     return (
@@ -230,7 +223,7 @@ export const Dashboard = () => {
                         stroke="hsl(240 5% 65%)"
                         fontSize={12}
                         tickLine={false}
-                        tickFormatter={(value) => `$${value / 1000}k`}
+                        tickFormatter={(value) => formatCurrency(value, { compact: true })}
                       />
                       <Tooltip 
                         contentStyle={{
