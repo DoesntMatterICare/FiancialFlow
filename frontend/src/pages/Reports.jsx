@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -30,6 +29,7 @@ import {
 } from "recharts";
 import { getMonthlyReport, getYearlyReport } from "@/lib/api";
 import { toast } from "sonner";
+import { useCurrency } from "@/context/CurrencyContext";
 
 const MONTHS = [
   { value: "1", label: "January" },
@@ -53,6 +53,7 @@ const YEARS = Array.from({ length: 5 }, (_, i) => ({
 }));
 
 export const Reports = () => {
+  const { formatCurrency } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState(null);
   const [reportType, setReportType] = useState("monthly");
@@ -79,15 +80,6 @@ export const Reports = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value);
   };
 
   const downloadReport = () => {
@@ -328,7 +320,7 @@ export const Reports = () => {
                         type="number" 
                         stroke="hsl(240 5% 65%)"
                         fontSize={12}
-                        tickFormatter={(value) => `$${value / 1000}k`}
+                        tickFormatter={(value) => formatCurrency(value, { compact: true })}
                       />
                       <YAxis 
                         type="category" 
@@ -372,7 +364,7 @@ export const Reports = () => {
                       <YAxis 
                         stroke="hsl(240 5% 65%)"
                         fontSize={12}
-                        tickFormatter={(value) => `$${value / 1000}k`}
+                        tickFormatter={(value) => formatCurrency(value, { compact: true })}
                       />
                       <Tooltip 
                         contentStyle={{
