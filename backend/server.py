@@ -48,6 +48,18 @@ class TransactionType(str, Enum):
     EXPENSE = "expense"
     TRANSFER = "transfer"
 
+class Currency(str, Enum):
+    USD = "USD"
+    INR = "INR"
+    EUR = "EUR"
+    GBP = "GBP"
+    JPY = "JPY"
+    AUD = "AUD"
+    CAD = "CAD"
+    CHF = "CHF"
+    CNY = "CNY"
+    SGD = "SGD"
+
 class Category(str, Enum):
     SALARY = "Salary"
     FREELANCE = "Freelance"
@@ -116,6 +128,7 @@ class TaxEstimateRequest(BaseModel):
     deductions: float = 0
     filing_status: str = "single"  # single, married, head_of_household
     state: str = "CA"
+    country: str = "US"  # US, IN (India), UK, etc.
 
 class TaxEstimateResponse(BaseModel):
     gross_income: float
@@ -126,6 +139,20 @@ class TaxEstimateResponse(BaseModel):
     total_tax: float
     effective_rate: float
     marginal_rate: float
+    currency: str = "USD"
+
+class UserSettings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = "default"
+    currency: str = "USD"
+    country: str = "US"
+    locale: str = "en-US"
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class UserSettingsUpdate(BaseModel):
+    currency: Optional[str] = None
+    country: Optional[str] = None
+    locale: Optional[str] = None
 
 # ============== CATEGORY RULES ==============
 CATEGORY_RULES = {
@@ -208,42 +235,80 @@ def detect_anomalies(transactions: List[dict], threshold: float = 2.0) -> List[s
     
     return anomaly_ids
 
-def calculate_federal_tax(taxable_income: float, filing_status: str) -> tuple:
-    """Calculate federal tax using 2024 tax brackets"""
-    brackets = {
-        "single": [
-            (11600, 0.10),
-            (47150, 0.12),
-            (100525, 0.22),
-            (191950, 0.24),
-            (243725, 0.32),
-            (609350, 0.35),
-            (float('inf'), 0.37)
-        ],
-        "married": [
-            (23200, 0.10),
-            (94300, 0.12),
-            (201050, 0.22),
-            (383900, 0.24),
-            (487450, 0.32),
-            (731200, 0.35),
-            (float('inf'), 0.37)
-        ],
-        "head_of_household": [
-            (16550, 0.10),
-            (63100, 0.12),
-            (100500, 0.22),
-            (191950, 0.24),
-            (243700, 0.32),
-            (609350, 0.35),
-            (float('inf'), 0.37)
-        ]
-    }
+def calculate_federal_tax(taxable_income: float, filing_status: str, country: str = "US") -> tuple:
+    """Calculate federal/central tax based on country"""
     
-    tax_brackets = brackets.get(filing_status, brackets["single"])
+    if country == "IN":
+        # India Tax Slabs FY 2024-25 (New Tax Regime)
+        brackets = {
+            "single": [
+                (300000, 0.0),      # Up to 3 lakh - nil
+                (700000, 0.05),     # 3-7 lakh - 5%
+                (1000000, 0.10),    # 7-10 lakh - 10%
+                (1200000, 0.15),    # 10-12 lakh - 15%
+                (1500000, 0.20),    # 12-15 lakh - 20%
+                (float('inf'), 0.30) # Above 15 lakh - 30%
+            ],
+            "married": [
+                (300000, 0.0),
+                (700000, 0.05),
+                (1000000, 0.10),
+                (1200000, 0.15),
+                (1500000, 0.20),
+                (float('inf'), 0.30)
+            ]
+        }
+    elif country == "UK":
+        # UK Tax Bands 2024-25
+        brackets = {
+            "single": [
+                (12570, 0.0),       # Personal Allowance
+                (50270, 0.20),      # Basic rate
+                (125140, 0.40),     # Higher rate
+                (float('inf'), 0.45) # Additional rate
+            ],
+            "married": [
+                (12570, 0.0),
+                (50270, 0.20),
+                (125140, 0.40),
+                (float('inf'), 0.45)
+            ]
+        }
+    else:  # US (default)
+        brackets = {
+            "single": [
+                (11600, 0.10),
+                (47150, 0.12),
+                (100525, 0.22),
+                (191950, 0.24),
+                (243725, 0.32),
+                (609350, 0.35),
+                (float('inf'), 0.37)
+            ],
+            "married": [
+                (23200, 0.10),
+                (94300, 0.12),
+                (201050, 0.22),
+                (383900, 0.24),
+                (487450, 0.32),
+                (731200, 0.35),
+                (float('inf'), 0.37)
+            ],
+            "head_of_household": [
+                (16550, 0.10),
+                (63100, 0.12),
+                (100500, 0.22),
+                (191950, 0.24),
+                (243700, 0.32),
+                (609350, 0.35),
+                (float('inf'), 0.37)
+            ]
+        }
+    
+    tax_brackets = brackets.get(filing_status, brackets.get("single", brackets[list(brackets.keys())[0]]))
     tax = 0
     prev_bracket = 0
-    marginal_rate = 0.10
+    marginal_rate = tax_brackets[0][1] if tax_brackets else 0.10
     
     for bracket, rate in tax_brackets:
         if taxable_income <= bracket:
@@ -257,22 +322,45 @@ def calculate_federal_tax(taxable_income: float, filing_status: str) -> tuple:
     
     return tax, marginal_rate
 
-def calculate_state_tax(taxable_income: float, state: str) -> float:
-    """Simplified state tax calculation"""
-    state_rates = {
-        "CA": 0.0725,
-        "NY": 0.0685,
-        "TX": 0.0,
-        "FL": 0.0,
-        "WA": 0.0,
-        "IL": 0.0495,
-        "PA": 0.0307,
-        "OH": 0.04,
-        "GA": 0.055,
-        "NC": 0.0525,
-    }
-    rate = state_rates.get(state.upper(), 0.05)
-    return taxable_income * rate
+def calculate_state_tax(taxable_income: float, state: str, country: str = "US") -> float:
+    """Calculate state/regional tax based on country"""
+    
+    if country == "IN":
+        # India doesn't have state income tax (GST is separate)
+        # But some states have professional tax (max ₹2500/year)
+        state_rates = {
+            "MH": 2500,  # Maharashtra
+            "KA": 2400,  # Karnataka
+            "TN": 2500,  # Tamil Nadu
+            "AP": 2500,  # Andhra Pradesh
+            "TG": 2500,  # Telangana
+            "WB": 2500,  # West Bengal
+            "GJ": 2500,  # Gujarat
+            "DL": 0,     # Delhi (no professional tax)
+        }
+        return state_rates.get(state.upper(), 0)
+    
+    elif country == "UK":
+        # UK doesn't have regional income tax (Scotland has different rates)
+        if state.upper() == "SC":  # Scotland
+            return taxable_income * 0.01  # Simplified Scottish rate difference
+        return 0
+    
+    else:  # US
+        state_rates = {
+            "CA": 0.0725,
+            "NY": 0.0685,
+            "TX": 0.0,
+            "FL": 0.0,
+            "WA": 0.0,
+            "IL": 0.0495,
+            "PA": 0.0307,
+            "OH": 0.04,
+            "GA": 0.055,
+            "NC": 0.0525,
+        }
+        rate = state_rates.get(state.upper(), 0.05)
+        return taxable_income * rate
 
 def forecast_cash_flow(transactions: List[dict], months_ahead: int = 6) -> List[dict]:
     """Simple linear regression based cash flow forecast"""
@@ -865,24 +953,93 @@ async def get_category_breakdown():
     
     return {"total": round(total, 2), "breakdown": breakdown}
 
+# ---------- USER SETTINGS ----------
+@api_router.get("/settings")
+async def get_settings():
+    """Get user settings"""
+    settings = await db.settings.find_one({"id": "default"}, {"_id": 0})
+    if not settings:
+        # Create default settings
+        default = UserSettings().model_dump()
+        await db.settings.insert_one(default)
+        return default
+    return settings
+
+@api_router.put("/settings")
+async def update_settings(input: UserSettingsUpdate):
+    """Update user settings"""
+    update_data = {k: v for k, v in input.model_dump().items() if v is not None}
+    update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    await db.settings.update_one(
+        {"id": "default"},
+        {"$set": update_data},
+        upsert=True
+    )
+    
+    settings = await db.settings.find_one({"id": "default"}, {"_id": 0})
+    return settings
+
+# ---------- CURRENCIES ----------
+@api_router.get("/currencies")
+async def get_currencies():
+    """Get all supported currencies with details"""
+    currencies = [
+        {"code": "USD", "symbol": "$", "name": "US Dollar", "locale": "en-US"},
+        {"code": "INR", "symbol": "₹", "name": "Indian Rupee", "locale": "en-IN"},
+        {"code": "EUR", "symbol": "€", "name": "Euro", "locale": "de-DE"},
+        {"code": "GBP", "symbol": "£", "name": "British Pound", "locale": "en-GB"},
+        {"code": "JPY", "symbol": "¥", "name": "Japanese Yen", "locale": "ja-JP"},
+        {"code": "AUD", "symbol": "A$", "name": "Australian Dollar", "locale": "en-AU"},
+        {"code": "CAD", "symbol": "C$", "name": "Canadian Dollar", "locale": "en-CA"},
+        {"code": "CHF", "symbol": "CHF", "name": "Swiss Franc", "locale": "de-CH"},
+        {"code": "CNY", "symbol": "¥", "name": "Chinese Yuan", "locale": "zh-CN"},
+        {"code": "SGD", "symbol": "S$", "name": "Singapore Dollar", "locale": "en-SG"},
+    ]
+    return {"currencies": currencies}
+
+@api_router.get("/countries")
+async def get_countries():
+    """Get supported countries with tax info"""
+    countries = [
+        {"code": "US", "name": "United States", "currency": "USD", "has_state_tax": True},
+        {"code": "IN", "name": "India", "currency": "INR", "has_state_tax": False},
+        {"code": "UK", "name": "United Kingdom", "currency": "GBP", "has_state_tax": False},
+        {"code": "AU", "name": "Australia", "currency": "AUD", "has_state_tax": False},
+        {"code": "CA", "name": "Canada", "currency": "CAD", "has_state_tax": True},
+        {"code": "DE", "name": "Germany", "currency": "EUR", "has_state_tax": False},
+        {"code": "SG", "name": "Singapore", "currency": "SGD", "has_state_tax": False},
+    ]
+    return {"countries": countries}
+
 # ---------- TAX ESTIMATION ----------
 @api_router.post("/tax/estimate", response_model=TaxEstimateResponse)
 async def estimate_tax(input: TaxEstimateRequest):
-    """Calculate estimated taxes"""
-    standard_deduction = {
-        "single": 14600,
-        "married": 29200,
-        "head_of_household": 21900
+    """Calculate estimated taxes based on country"""
+    country = input.country.upper()
+    
+    # Standard deductions by country
+    standard_deductions = {
+        "US": {"single": 14600, "married": 29200, "head_of_household": 21900},
+        "IN": {"single": 75000, "married": 75000},  # India standard deduction
+        "UK": {"single": 12570, "married": 12570},  # Personal allowance
     }
     
-    total_deductions = max(input.deductions, standard_deduction.get(input.filing_status, 14600))
+    country_deductions = standard_deductions.get(country, standard_deductions["US"])
+    default_deduction = country_deductions.get(input.filing_status, list(country_deductions.values())[0])
+    
+    total_deductions = max(input.deductions, default_deduction)
     taxable_income = max(0, input.annual_income - total_deductions)
     
-    federal_tax, marginal_rate = calculate_federal_tax(taxable_income, input.filing_status)
-    state_tax = calculate_state_tax(taxable_income, input.state)
+    federal_tax, marginal_rate = calculate_federal_tax(taxable_income, input.filing_status, country)
+    state_tax = calculate_state_tax(taxable_income, input.state, country)
     total_tax = federal_tax + state_tax
     
     effective_rate = (total_tax / input.annual_income * 100) if input.annual_income > 0 else 0
+    
+    # Get currency for country
+    currency_map = {"US": "USD", "IN": "INR", "UK": "GBP", "AU": "AUD", "CA": "CAD"}
+    currency = currency_map.get(country, "USD")
     
     return TaxEstimateResponse(
         gross_income=round(input.annual_income, 2),
@@ -892,13 +1049,15 @@ async def estimate_tax(input: TaxEstimateRequest):
         state_tax=round(state_tax, 2),
         total_tax=round(total_tax, 2),
         effective_rate=round(effective_rate, 2),
-        marginal_rate=round(marginal_rate * 100, 2)
+        marginal_rate=round(marginal_rate * 100, 2),
+        currency=currency
     )
 
 @api_router.get("/tax/estimate-from-transactions")
 async def estimate_tax_from_transactions(
     filing_status: str = "single",
-    state: str = "CA"
+    state: str = "CA",
+    country: str = "US"
 ):
     """Estimate taxes based on transaction history"""
     transactions = await db.transactions.find({"type": "income"}, {"_id": 0}).to_list(5000)
@@ -915,7 +1074,8 @@ async def estimate_tax_from_transactions(
         annual_income=total_income,
         deductions=deductions,
         filing_status=filing_status,
-        state=state
+        state=state,
+        country=country
     )
     
     return await estimate_tax(request)
