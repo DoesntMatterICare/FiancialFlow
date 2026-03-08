@@ -136,4 +136,26 @@ export const getCategories = async () => {
   return response.data;
 };
 
+// Settings
+export const getSettings = async () => {
+  const response = await api.get('/settings');
+  return response.data;
+};
+
+export const updateSettings = async (data) => {
+  const response = await api.put('/settings', data);
+  return response.data;
+};
+
+// Currencies & Countries
+export const getCurrencies = async () => {
+  const response = await api.get('/currencies');
+  return response.data;
+};
+
+export const getCountries = async () => {
+  const response = await api.get('/countries');
+  return response.data;
+};
+
 export default api;
