@@ -92,11 +92,11 @@ class TestAnalyticsConvertedAPI:
         assert "total_income" in data
         assert "total_expenses" in data
         assert "net_balance" in data
-        assert "base_currency" in data
-        assert data["base_currency"] == "USD"
+        assert "currency" in data
+        assert data["currency"] == "USD"
+        assert data["converted"] == True
         
         print(f"USD Summary: income={data['total_income']}, expenses={data['total_expenses']}, balance={data['net_balance']}")
-        return data
     
     def test_analytics_summary_converted_inr(self):
         """Test /api/analytics/summary/converted with INR base currency"""
@@ -109,10 +109,9 @@ class TestAnalyticsConvertedAPI:
         assert "total_income" in data
         assert "total_expenses" in data
         assert "net_balance" in data
-        assert data["base_currency"] == "INR"
+        assert data["currency"] == "INR"
         
         print(f"INR Summary: income={data['total_income']}, expenses={data['total_expenses']}, balance={data['net_balance']}")
-        return data
     
     def test_analytics_summary_converted_eur(self):
         """Test /api/analytics/summary/converted with EUR base currency"""
@@ -122,9 +121,8 @@ class TestAnalyticsConvertedAPI:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["base_currency"] == "EUR"
+        assert data["currency"] == "EUR"
         print(f"EUR Summary: income={data['total_income']}, expenses={data['total_expenses']}")
-        return data
     
     def test_currency_conversion_values_differ(self):
         """Verify that USD and INR values are different (conversion is working)"""
